@@ -1,5 +1,5 @@
 {
-  "name": "trace-iq",
+  "name": "@common-sense/trace-iq",
   "version": "0.1.0",
   "description": "Lightweight W3C traceparent + async context utilities for Node.js",
   "main": "dist/index.js",
