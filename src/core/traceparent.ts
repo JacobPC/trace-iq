@@ -37,6 +37,7 @@ export type TraceParentInit = {
   spanId?: string;
   flags?: string;
   parentSpanId?: string;
+  traceState?: string; // W3C tracestate header value
 };
 
 export class TraceParent {
@@ -45,6 +46,7 @@ export class TraceParent {
   readonly spanId: string;
   readonly flags: string;
   readonly parentSpanId?: string;
+  readonly traceState?: string;
 
   private constructor(init: TraceParentInit) {
     this.version = (init.version ?? "00").toLowerCase();
@@ -52,6 +54,7 @@ export class TraceParent {
     this.spanId = (init.spanId ?? TraceParent.generateSpanId()).toLowerCase();
     this.flags = (init.flags ?? "01").toLowerCase();
     this.parentSpanId = init.parentSpanId;
+    this.traceState = init.traceState;
 
     if (!TraceParent.validate(this)) {
       throw new Error("Invalid traceparent fields");
@@ -70,7 +73,7 @@ export class TraceParent {
     return toHex(generateRandomBytes(8));
   }
 
-  static parse(header: string): TraceParent {
+  static parse(header: string, traceState?: string): TraceParent {
     const value = header.trim().toLowerCase();
     const parts = value.split("-");
     if (parts.length !== 4) {
@@ -89,7 +92,7 @@ export class TraceParent {
     if (!isLowercaseHex(flags, 2)) {
       throw new Error("Invalid flags");
     }
-    return new TraceParent({ version, traceId, spanId, flags });
+    return new TraceParent({ version, traceId, spanId, flags, traceState });
   }
 
   toString(): string {
@@ -103,6 +106,7 @@ export class TraceParent {
       spanId: TraceParent.generateSpanId(),
       flags: this.flags,
       parentSpanId: this.spanId,
+      traceState: this.traceState,
     });
   }
 
