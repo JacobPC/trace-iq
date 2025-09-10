@@ -1,5 +1,6 @@
 export { TraceParent } from "./core/traceparent";
 export { runWithTrace, getCurrentTrace, traceAsyncLocalStorage } from "./core/context";
+export { setGlobalSampler, getGlobalSampler, shouldSample } from "./core/sampling";
 export {
   extractOrCreateTraceFromHeaders,
   expressTracingMiddleware,
@@ -21,4 +22,5 @@ export {
   attachTraceToLogger,
 } from "./logging/index";
 export { LogExecution, logFunction } from "./decorators/index";
+export { withTracingFetch, withTracingAxios } from "./http-client/index";
 
