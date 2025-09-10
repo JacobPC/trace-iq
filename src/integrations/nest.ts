@@ -15,6 +15,7 @@ export class TraceInterceptor {
     const res = http.getResponse();
     const trace = getOrCreateTraceForRequest(req);
     res.setHeader("traceparent", trace.toString());
+    if (trace.traceState) res.setHeader("tracestate", trace.traceState);
     const result = next.handle();
     return wrapObservableWithTrace(trace, result);
   }

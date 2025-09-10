@@ -7,6 +7,7 @@ export function koaTracingMiddleware() {
     const req = (ctx.req as IncomingMessageLike);
     const trace = getOrCreateTraceForRequest(req);
     ctx.set("traceparent", trace.toString());
+    if (trace.traceState) ctx.set("tracestate", trace.traceState);
     return runWithTrace(trace, () => next());
   };
 }

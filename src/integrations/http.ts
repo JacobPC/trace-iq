@@ -4,6 +4,7 @@ import { TraceParent } from "../core/traceparent";
 import { runWithTrace } from "../core/context";
 
 const TRACEPARENT_HEADER = "traceparent";
+const TRACESTATE_HEADER = "tracestate";
 
 function readHeaderValue(
   headers: IncomingHttpHeaders | Record<string, string | string[] | undefined>,
@@ -20,9 +21,10 @@ export function extractOrCreateTraceFromHeaders(
   headers: IncomingHttpHeaders | Record<string, string | string[] | undefined>
 ): TraceParent {
   const header = readHeaderValue(headers, TRACEPARENT_HEADER);
+  const tracestate = readHeaderValue(headers, TRACESTATE_HEADER);
   if (!header) return TraceParent.generate();
   try {
-    const parsed = TraceParent.parse(header);
+    const parsed = TraceParent.parse(header, tracestate);
     return parsed;
   } catch {
     return TraceParent.generate();
@@ -41,6 +43,7 @@ export function withHttpTracing(
   return function tracedHandler(req: IncomingMessageLike, res: ServerResponseLike) {
     const trace = getOrCreateTraceForRequest(req);
     res.setHeader(TRACEPARENT_HEADER, trace.toString());
+    if (trace.traceState) res.setHeader(TRACESTATE_HEADER, trace.traceState);
     return runWithTrace(trace, () => handler(req, res));
   };
 }
@@ -49,6 +52,7 @@ export function expressTracingMiddleware() {
   return function middleware(req: any, res: any, next: (err?: any) => void) {
     const trace = getOrCreateTraceForRequest(req as IncomingMessageLike);
     res.setHeader(TRACEPARENT_HEADER, trace.toString());
+    if (trace.traceState) res.setHeader(TRACESTATE_HEADER, trace.traceState);
     runWithTrace(trace, () => next());
   };
 }
