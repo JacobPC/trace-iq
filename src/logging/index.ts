@@ -1,4 +1,6 @@
 import { getCurrentTrace } from "../core/context";
+import { getCurrentTraceId } from "../core/traceid-context";
+import { getCurrentTracingFlavor } from "../core/flavor";
 
 export type TraceLogContext = {
   traceId?: string;
@@ -6,9 +8,21 @@ export type TraceLogContext = {
 };
 
 export function getTraceLogContext(): TraceLogContext | undefined {
-  const tp = getCurrentTrace();
-  if (!tp) return undefined;
-  return { traceId: tp.traceId, spanId: tp.spanId };
+  const flavor = getCurrentTracingFlavor();
+  if (flavor === "traceparent") {
+    const tp = getCurrentTrace();
+    if (tp) return { traceId: tp.traceId, spanId: tp.spanId };
+  } else if (flavor === "traceid") {
+    const id = getCurrentTraceId();
+    if (id) return { traceId: id };
+  } else {
+    // if no flavor set, prefer traceparent if present, else traceid
+    const tp = getCurrentTrace();
+    if (tp) return { traceId: tp.traceId, spanId: tp.spanId };
+    const id = getCurrentTraceId();
+    if (id) return { traceId: id };
+  }
+  return undefined;
 }
 
 function isoTimestamp(): string {

@@ -4,6 +4,20 @@
   "description": "Lightweight W3C traceparent + async context utilities for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./traceparent": {
+      "types": "./dist/traceparent/index.d.ts",
+      "default": "./dist/traceparent/index.js"
+    },
+    "./traceid": {
+      "types": "./dist/traceid/index.d.ts",
+      "default": "./dist/traceid/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",

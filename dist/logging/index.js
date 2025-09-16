@@ -10,11 +10,30 @@ exports.bunyanChildWithTrace = bunyanChildWithTrace;
 exports.attachTraceToLogger = attachTraceToLogger;
 exports.createConsoleJsonLogger = createConsoleJsonLogger;
 const context_1 = require("../core/context");
+const traceid_context_1 = require("../core/traceid-context");
+const flavor_1 = require("../core/flavor");
 function getTraceLogContext() {
-    const tp = (0, context_1.getCurrentTrace)();
-    if (!tp)
-        return undefined;
-    return { traceId: tp.traceId, spanId: tp.spanId };
+    const flavor = (0, flavor_1.getCurrentTracingFlavor)();
+    if (flavor === "traceparent") {
+        const tp = (0, context_1.getCurrentTrace)();
+        if (tp)
+            return { traceId: tp.traceId, spanId: tp.spanId };
+    }
+    else if (flavor === "traceid") {
+        const id = (0, traceid_context_1.getCurrentTraceId)();
+        if (id)
+            return { traceId: id };
+    }
+    else {
+        // if no flavor set, prefer traceparent if present, else traceid
+        const tp = (0, context_1.getCurrentTrace)();
+        if (tp)
+            return { traceId: tp.traceId, spanId: tp.spanId };
+        const id = (0, traceid_context_1.getCurrentTraceId)();
+        if (id)
+            return { traceId: id };
+    }
+    return undefined;
 }
 function isoTimestamp() {
     return new Date().toISOString();
