@@ -1,7 +1,16 @@
 {
   "name": "@common-sense/trace-iq",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Lightweight W3C traceparent + async context utilities for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JacobPC/trace-iq.git"
+  },
+  "homepage": "https://github.com/JacobPC/trace-iq#readme",
+  "author": "JacobPC",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
